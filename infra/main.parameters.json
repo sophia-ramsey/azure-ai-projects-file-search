@@ -48,7 +48,7 @@
       "value": "${USE_APPLICATION_INSIGHTS=true}"
     },
     "useSearchService": {
-      "value": "${USE_SEARCH_SERVICE=false}"
+      "value": "${USE_SEARCH_SERVICE=true}"
     },
     "chatDeploymentName": {
       "value": "${AZURE_AI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini}"
