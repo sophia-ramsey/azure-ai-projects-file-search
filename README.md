@@ -1,22 +1,3 @@
----
-page_type: sample
-languages:
-- azdeveloper
-- bicep
-- python
-products:
-- azure
-- azure-openai
-- azure-ai
-- azure-cognitive-search
-- azure-container-apps
-urlFragment: azureai-basic-python
-name: Azure AI basic template (Python)
-description: Creates an Azure AI Foundry hub, project and required dependent resources including Azure AI Services, Azure AI Search and more. Deploys a simple chat application.
----
-<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
-<!-- TODO: update this^ -->
-
 # Azure AI Foundry Starter Template
 
 This project creates an Azure AI Foundry hub, project and connected resources including Azure AI Services, AI Search and more. It deploys an agent chat application to Azure Container Apps that uses Azure File Search with uploaded files and can provide citations.
