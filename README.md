@@ -72,6 +72,32 @@ To add tools, update the `agents.yaml` file located in the repository.
 <!-- To add files to be used for file search, upload your files to `src/api/files`. -->
 <!-- TODO: do we want this functionality? we would need to slightly alter the py file -->
 
+#### Logging
+If you want to enable logging to a file, uncomment the following line in Dockerfile located in the src directory:
+
+ ```
+ ENV APP_LOG_FILE=app.log
+ ```
+
+ By default the file name app.log is used. You can provide your own file name by replacing app.log with the desired log file name.
+
+ **NOTE!** Any changes to the Dockerfile require a re-deployment in order for the changes to take effect.
+
+Consider whether you want to have logging to file enabled after the R&D phase, when running in production.
+
+#### Tracing to Azure Monitor
+To enable tracing to Azure Monitor, modify the value of ENABLE_AZURE_MONITOR_TRACING environment variable to true in Dockerfile found in src directory:
+```code
+ENV ENABLE_AZURE_MONITOR_TRACING=true
+```
+Note that the optional App Insights resource is required for tracing to Azure Monitor (it is created by default).
+
+To enable message contents to be included in the traces, set the following environment variable to true in the same Dockerfile. Note that the messages may contain personally identifiable information.
+
+```code
+ENV AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED=true
+```
+
 
 #### Local Development Server
 
