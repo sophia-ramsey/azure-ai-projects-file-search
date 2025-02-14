@@ -1,7 +1,7 @@
 
-# Azure AI Foundry Starter Template: Deployment customization
+# Getting Started with Agents Using Azure AI Foundry: Deployment customization
 
-This document describes how to customize the deployment of the Azure AI Foundry Starter Template. Once you follow the steps here, you can run `azd up` as described in the [Deploying](./README.md#deploying) steps.
+This document describes how to customize the deployment of the Agents Chat with Azure AI Foundry. Once you follow the steps here, you can run `azd up` as described in the [Deploying](./README.md#deploying) steps.
 
 * [Disabling resources](#disabling-resources)
 * [Customizing resource names](#customizing-resource-names)
@@ -9,16 +9,18 @@ This document describes how to customize the deployment of the Azure AI Foundry 
 
 ## Disabling resources
 
+Disabling a resource will stop that resource from being created and deployed to your Azure Project. 
+
 * To disable AI Search, run `azd env set USE_SEARCH_SERVICE false`
 * To disable Application Insights, run `azd env set USE_APPLICATION_INSIGHTS false`
 * To disable Container Registry, run `azd env set USE_CONTAINER_REGISTRY false`
 
-Then run `azd up` to deploy the remaining resources.
+Once you disable these resources, they will not be deployed when you run `azd up`.
 
 ## Customizing resource names
 
-By default this template will use a default naming convention to prevent naming collisions within Azure.
-To override default naming conventions the following can be set.
+By default, this template will use a naming convention with unique strings to prevent naming collisions within Azure.
+To override default naming conventions, the following keys can be set:
 
 * `AZURE_AIHUB_NAME` - The name of the AI Foundry Hub resource
 * `AZURE_AIPROJECT_NAME` - The name of the AI Foundry Project
@@ -34,6 +36,8 @@ To override default naming conventions the following can be set.
 To override any of those resource names, run `azd env set <key> <value>` before running `azd up`.
 
 ## Customizing model deployments
+
+For more information on the Azure OpenAI models and non-Microsoft models that can be used in your deployment, view the [list of models supported by Azure AI Agent Service](https://learn.microsoft.com/azure/ai-services/agents/concepts/model-region-support)
 
 To customize the model deployments, you can set the following environment variables:
 
@@ -65,12 +69,12 @@ azd env set AZURE_AI_CHAT_MODEL_VERSION 2
 
 ### Setting capacity and deployment SKU
 
-For quota regions, you may find yourself needing to modify the default capacity and deployment SKU.
+For quota regions, you may find yourself needing to modify the default capacity and deployment SKU. The default tokens per minute deployed in this template is 50,000. 
 
-Change the capacity of the chat deployment:
+Change the capacity (in thousands of tokens per minute) of the chat deployment:
 
 ```shell
-azd env set AZURE_AI_CHAT_DEPLOYMENT_CAPACITY 10
+azd env set AZURE_AI_CHAT_DEPLOYMENT_CAPACITY 50
 ```
 
 Change the SKU of the chat deployment:
@@ -79,10 +83,10 @@ Change the SKU of the chat deployment:
 azd env set AZURE_AI_CHAT_DEPLOYMENT_SKU Standard
 ```
 
-Change the capacity of the embeddings deployment:
+Change the capacity (in thousands of tokens per minute) of the embeddings deployment:
 
 ```shell
-azd env set AZURE_AI_EMBED_DEPLOYMENT_CAPACITY 10
+azd env set AZURE_AI_EMBED_DEPLOYMENT_CAPACITY 50
 ```
 
 Change the SKU of the embeddings deployment:
@@ -90,15 +94,3 @@ Change the SKU of the embeddings deployment:
 ```shell
 azd env set AZURE_AI_EMBED_DEPLOYMENT_SKU Standard
 ```
-
-## Bringing an existing AI project resource
-
-If you have an existing AI project resource, you can bring it into the Azure AI Foundry Starter Template by setting the following environment variable:
-
-```shell
-azd env set AZURE_EXISTING_AIPROJECT_CONNECTION_STRING "<connection-string>"
-```
-
-You can find the connection string on the overview page of your Azure AI project.
-
-If you do not have a deployment named "gpt-4o-mini" in your existing AI project, you should either create one in Azure AI Foundry or follow the steps in [Customizing model deployments](#customizing-model-deployments) to specify a different model.
