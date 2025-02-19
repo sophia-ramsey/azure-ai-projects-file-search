@@ -43,6 +43,14 @@ You can find the connection string on the overview page of your Azure AI project
 
 This solution has been configured to use "gpt-4o-mini" model. If you do not have a deployment named "gpt-4o-mini" in your existing AI project, you should either create one in Azure AI Foundry or follow the steps in [Customizing model deployments](#customizing-model-deployments) to specify a different model.
 
+#### Creating and Importing an Agent
+
+In Azure AI Foundry, create a new agent in the Agents Playground for your project. You can customize your agent name, model deployment, instructions, and tools, as well as upload files for file search. For more information on creating an agent, view [Quickstart: Create a New Agent](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=ai-foundry). After creating your agent, import the agent into this template by copying the agent_id and setting the following environment variable:
+
+```shell
+azd env set AZURE_AI_AGENT_ID "<agent_id>"
+```
+
 
 ## Development
 
