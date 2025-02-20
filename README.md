@@ -45,7 +45,28 @@ This solution has been configured to use "gpt-4o-mini" model. If you do not have
 
 #### Creating and Importing an Agent
 
-In Azure AI Foundry, create a new agent in the Agents Playground for your project. You can customize your agent name, model deployment, instructions, and tools, as well as upload files for file search. For more information on creating an agent, view [Quickstart: Create a New Agent](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=ai-foundry). After creating your agent, import the agent into this template by copying the agent_id and setting the following environment variable:
+You can create an agent in your project to import to this template. For more information on creating an agent, view [Quickstart: Create a New Agent](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=ai-foundry). There are three agent creation options:
+
+<details>
+  <summary><b>Azure AI Foundry Agents Playground</b></summary> 
+In Azure AI Foundry, navigate to the Agents Playground for your project. Here, you can create an agent and customize its name, model deployment, instructions, and tools, as well as upload files for file search. 
+</details>
+
+<details>
+  <summary><b>SDK Samples</b></summary> 
+
+You can create an agent using the Azure AI Projects SDK. By following the [instructions to create an agent using Python](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=programming-language-python-azure), you can create an agent using code based on the SDK samples. 
+
+</details>
+
+<details>
+  <summary><b>Assistants Tool</b></summary>
+
+Using the [Azure AI Assistants Tool](https://github.com/Azure-Samples/azureai-assistant-tool), you can create an agent and customize it with tools and functions. Then, you can export the agent and use the agent_id.  
+<!-- TODO: do we need to implement agents.yaml changes in order to use this solution? -->
+</details>
+
+After creating your agent, import the agent into this template by copying the agent_id and setting the following environment variable:
 
 ```shell
 azd env set AZURE_AI_AGENT_ID "<agent_id>"
