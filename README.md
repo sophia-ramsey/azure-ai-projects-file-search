@@ -49,7 +49,8 @@ You can create an agent in your project to import to this template. For more inf
 
 <details>
   <summary><b>Azure AI Foundry Agents Playground</b></summary> 
-In Azure AI Foundry, navigate to the Agents Playground for your project. Here, you can create an agent and customize its name, model deployment, instructions, and tools, as well as upload files for file search. 
+
+In [Azure AI Foundry](https://ai.azure.com/), navigate to the Agents Playground for your project. Here, you can create an agent and customize its name, model deployment, instructions, and tools, as well as upload files for file search. 
 </details>
 
 <details>
