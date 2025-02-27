@@ -62,6 +62,8 @@ param keyVaultName string = ''
 param searchServiceName string = ''
 @description('The Azure Search connection name. If ommited will use a default value')
 param searchConnectionName string = ''
+@description('The search index name')
+param aiSearchIndexName string = ''
 @description('The Azure Storage Account resource name. If ommited will be generated')
 param storageAccountName string = ''
 @description('The log analytics workspace name. If ommited will be generated')
@@ -101,6 +103,8 @@ param embedModelFormat string
 param embedModelName string
 @description('Name of the embedding model deployment')
 param embedDeploymentName string
+@description('Embedding model dimensionality')
+param embedDeploymentDimensions string
 
 @description('Version of the embedding model to deploy')
 // See version availability in this table:
@@ -118,7 +122,8 @@ param embedDeploymentCapacity int
 
 param useContainerRegistry bool = true
 param useApplicationInsights bool = true
-param useSearch bool = false
+@description('Do we want to use the Azure AI Search')
+param useSearchService bool = false
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -168,6 +173,10 @@ var logAnalyticsWorkspaceResolvedName = !useApplicationInsights
       ? logAnalyticsWorkspaceName
       : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
 
+var resolvedSearchServiceName = !useSearchService
+  ? ''
+  : !empty(searchServiceName) ? searchServiceName : '${abbrs.searchSearchServices}${resourceToken}'
+
 var containerRegistryResolvedName = !useContainerRegistry
   ? ''
   : !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
@@ -192,10 +201,8 @@ module ai 'core/host/ai-environment.bicep' = if (empty(aiExistingProjectConnecti
       ? ''
       : !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
     containerRegistryName: containerRegistryResolvedName
-    searchServiceName: !useSearch
-      ? ''
-      : !empty(searchServiceName) ? searchServiceName : '${abbrs.searchSearchServices}${resourceToken}'
-    searchConnectionName: !useSearch
+    searchServiceName: resolvedSearchServiceName
+    searchConnectionName: !useSearchService
       ? ''
       : !empty(searchConnectionName) ? searchConnectionName : 'search-service-connection'
   }
@@ -216,60 +223,6 @@ var hostName = empty(aiExistingProjectConnectionString) ? split(ai.outputs.disco
 var projectConnectionString = empty(hostName)
   ? aiExistingProjectConnectionString
   : '${hostName};${subscription().subscriptionId};${rg.name};${projectName}'
-
-module userAcrRolePush 'core/security/role.bicep' = if (!empty(principalId)) {
-  name: 'user-role-acr-push'
-  scope: rg
-  params: {
-    principalId: principalId
-    roleDefinitionId: '8311e382-0749-4cb8-b61a-304f252e45ec'
-  }
-}
-
-module userAcrRolePull 'core/security/role.bicep' = if (!empty(principalId)) {
-  name: 'user-role-acr-pull'
-  scope: rg
-  params: {
-    principalId: principalId
-    roleDefinitionId: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-  }
-}
-
-module userRoleDataScientist 'core/security/role.bicep' = if (!empty(principalId)) {
-  name: 'user-role-data-scientist'
-  scope: rg
-  params: {
-    principalId: principalId
-    roleDefinitionId: 'f6c7c914-8db3-469d-8ca1-694a8f32e121'
-  }
-}
-
-module userRoleSecretsReader 'core/security/role.bicep' = if (!empty(principalId)) {
-  name: 'user-role-secrets-reader'
-  scope: rg
-  params: {
-    principalId: principalId
-    roleDefinitionId: 'ea01e6af-a1c1-4350-9563-ad00f8c72ec5'
-  }
-}
-
-module userRoleAzureAIDeveloper 'core/security/role.bicep' = if (!empty(principalId)) {
-  name: 'user-role-azureai-developer'
-  scope: rg
-  params: {
-    principalId: principalId
-    roleDefinitionId: '64702f94-c441-49e6-a78b-ef80e0188fee'
-  }
-}
-
-module backendRoleAzureAIDeveloperRG 'core/security/role.bicep' = {
-  name: 'backend-role-azureai-developer-rg'
-  scope: rg
-  params: {
-    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
-    roleDefinitionId: '64702f94-c441-49e6-a78b-ef80e0188fee'
-  }
-}
 
 var resolvedApplicationInsightsName = !useApplicationInsights || !empty(aiExistingProjectConnectionString)
   ? ''
@@ -329,7 +282,92 @@ module api 'api.bicep' = {
     containerRegistryName: containerApps.outputs.registryName
     projectConnectionString: projectConnectionString
     agentDeploymentName: agentDeploymentName
+    searchConnectionName: searchConnectionName
+    aiSearchIndexName: aiSearchIndexName
+    searchServiceEndpoint: searchServiceEndpoint
     exists: apiAppExists
+  }
+}
+
+module userAcrRolePush 'core/security/role.bicep' = if (!empty(principalId)) {
+  name: 'user-role-acr-push'
+  scope: rg
+  params: {
+    principalId: principalId
+    roleDefinitionId: '8311e382-0749-4cb8-b61a-304f252e45ec'
+  }
+}
+
+module userAcrRolePull 'core/security/role.bicep' = if (!empty(principalId)) {
+  name: 'user-role-acr-pull'
+  scope: rg
+  params: {
+    principalId: principalId
+    roleDefinitionId: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+  }
+}
+
+module userRoleDataScientist 'core/security/role.bicep' = if (!empty(principalId)) {
+  name: 'user-role-data-scientist'
+  scope: rg
+  params: {
+    principalId: principalId
+    roleDefinitionId: 'f6c7c914-8db3-469d-8ca1-694a8f32e121'
+  }
+}
+
+module userRoleSecretsReader 'core/security/role.bicep' = if (!empty(principalId)) {
+  name: 'user-role-secrets-reader'
+  scope: rg
+  params: {
+    principalId: principalId
+    roleDefinitionId: 'ea01e6af-a1c1-4350-9563-ad00f8c72ec5'
+  }
+}
+
+module userRoleAzureAIDeveloper 'core/security/role.bicep' = if (!empty(principalId)) {
+  name: 'user-role-azureai-developer'
+  scope: rg
+  params: {
+    principalId: principalId
+    roleDefinitionId: '64702f94-c441-49e6-a78b-ef80e0188fee'
+  }
+}
+
+module userRoleSearchIndexDataContributorRG 'core/security/role.bicep' = if (useSearchService) {
+  name: 'backend-role-azure-index-data-contributor-rg'
+  scope: rg
+  params: {
+    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+  }
+}
+
+
+module userRoleSearchIndexDataReaderRG 'core/security/role.bicep' = if (useSearchService) {
+  name: 'backend-role-azure-index-data-reader-rg'
+  scope: rg
+  params: {
+    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+  }
+}
+
+module userRoleSearchServiceContributorRG 'core/security/role.bicep' = if (useSearchService) {
+  name: 'backend-role-azure-search-service-contributor-rg'
+  scope: rg
+  params: {
+    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
+  }
+}
+
+module backendRoleAzureAIDeveloperRG 'core/security/role.bicep' = {
+  name: 'backend-role-azureai-developer-rg'
+  scope: rg
+  params: {
+    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '64702f94-c441-49e6-a78b-ef80e0188fee'
   }
 }
 
@@ -339,6 +377,11 @@ output AZURE_RESOURCE_GROUP string = rg.name
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_AIPROJECT_CONNECTION_STRING string = projectConnectionString
 output AZURE_AI_AGENT_DEPLOYMENT_NAME string = agentDeploymentName
+output AZURE_AI_SEARCH_CONNECTION_NAME string = searchConnectionName
+output AZURE_AI_EMBED_DEPLOYMENT_NAME string = embedDeploymentName
+output AZURE_AI_SEARCH_INDEX_NAME string = aiSearchIndexName
+output AZURE_AI_SEARCH_ENDPOINT string = searchServiceEndpoint
+output AZURE_AI_EMBED_DIMENSIONS string = embedDeploymentDimensions
 
 // Outputs required by azd for ACA
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
