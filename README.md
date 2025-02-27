@@ -40,10 +40,6 @@ The default for the model capacity in deployment is 50k tokens. For optimal perf
 * Select Quota, click the GlobalStandard dropdown and select the model and region you are using for this accelerator to see your available quota. Please note GPT-4o mini and text-embedding-ada-002 are used as default.
 * Request more quota or delete any unused model deployments as needed.
 
-#### Bringing Your Existing Project and Agent
-
-This feature is currently disabled due to required fixes on bicep/infra configuration to use existing resources instead of creating duplicate resources. 
-
 ## Development
 
 #### Code
