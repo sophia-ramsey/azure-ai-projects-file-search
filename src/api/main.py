@@ -102,7 +102,8 @@ async def lifespan(app: fastapi.FastAPI):
             if agent_list.data:
                 for agent_object in agent_list.data:
                     if agent_object.name == "agent-template-assistant":
-                        agent = await ai_client.agents.get_agent(agent_object.id)
+                        agent = agent_object
+                        # agent = await ai_client.agents.get_agent(agent_object.id)
         if agent == None:
             raise Exception("Agent not found")
 
