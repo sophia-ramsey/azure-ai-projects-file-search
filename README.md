@@ -40,18 +40,6 @@ The default for the model capacity in deployment is 50k tokens. For optimal perf
 * Select Quota, click the GlobalStandard dropdown and select the model and region you are using for this accelerator to see your available quota. Please note GPT-4o mini and text-embedding-ada-002 are used as default.
 * Request more quota or delete any unused model deployments as needed.
 
-#### Bringing an existing AI project resource
-
-This step applies if you have an existing AI project resource, and you want to bring it into the solution. You can do that by setting the following environment variable:
-
-```shell
-azd env set AZURE_EXISTING_AIPROJECT_CONNECTION_STRING "<connection-string>"
-```
-
-You can find the connection string on the overview page of your Azure AI project.
-
-This solution has been configured to use "gpt-4o-mini" model. If you do not have a deployment named "gpt-4o-mini" in your existing AI project, you should either create one in Azure AI Foundry or follow the steps in [Customizing model deployments](#customizing-model-deployments) to specify a different model.
-
 #### Bringing Your Existing Project and Agent
 
 This feature is currently disabled due to required fixes on bicep/infra configuration to use existing resources instead of creating duplicate resources. 
